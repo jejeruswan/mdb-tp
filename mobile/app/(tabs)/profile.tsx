@@ -124,7 +124,7 @@ export default function ProfileScreen() {
         </View>
 
         {/* Recent Views */}
-        <View style={styles.section}>
+        {/* <View style={styles.section}>
           <Text style={styles.sectionTitle}>Your Recent Views</Text>
           <ScrollView
             horizontal
@@ -147,9 +147,64 @@ export default function ProfileScreen() {
               </TouchableOpacity>
             ))}
           </ScrollView>
-        </View>
+        </View> */}
 
-        {/* Quick Add */}
+        {/* Saved */}
+ {/* <View style={styles.section}>
+  <View style={styles.header}>
+    <Text style={styles.sectionTitle}>Saved Events</Text>
+    {savedEvents.length > 0 && (
+      <Text style={styles.eventCount}>{savedEvents.length}</Text>
+    )}
+  </View>
+  
+  {savedEvents.length > 0 ? (
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      contentContainerStyle={styles.savedEventsList}
+    >
+      {savedEvents.map((event) => (
+        <TouchableOpacity
+          key={event.id}
+          style={styles.savedEventCard}
+          onPress={() => handleEventPress(event)}
+          activeOpacity={0.7}
+        >
+          <Image
+            source={{ uri: event.image_url || DEFAULT_EVENT_IMAGE }}
+            style={styles.savedEventImage}
+          />
+          <View style={styles.savedEventInfo}>
+            <Text style={styles.savedEventTitle} numberOfLines={2}>
+              {event.title}
+            </Text>
+            <Text style={styles.savedEventDate} numberOfLines={1}>
+              {event.date}
+            </Text>
+            {event.location && (
+              <Text style={styles.savedEventLocation} numberOfLines={1}>
+                📍 {event.location}
+              </Text>
+            )}
+          </View>
+        </TouchableOpacity>
+      ))}
+    </ScrollView>
+  ) : (
+    <View style={styles.emptyState}>
+      <Text style={styles.emptyStateEmoji}>💾</Text>
+      <Text style={styles.emptyStateText}>No saved events yet</Text>
+      <Text style={styles.emptyStateSubtext}>
+        Save events to view them here
+      </Text>
+    </View>
+  )}
+</View> */}
+
+
+
+        {/* Quick Add
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Quick Add</Text>
           <View style={styles.quickAddList}>
@@ -192,7 +247,7 @@ export default function ProfileScreen() {
               </View>
             ))}
           </View>
-        </View>
+        </View> */}
 
         {/* Bottom padding for tab bar */}
         <View style={{ height: 100 }} />
@@ -340,5 +395,64 @@ const styles = StyleSheet.create({
   },
   quickAddButton: {
     padding: theme.spacing.xs,
+  },
+  savedEventsList: {
+    paddingHorizontal: theme.spacing.lg,
+    gap: theme.spacing.md,
+  },
+  savedEventCard: {
+    width: 280,
+    backgroundColor: theme.colors.white,
+    borderRadius: theme.borderRadius.lg,
+    overflow: 'hidden',
+    marginRight: theme.spacing.md,
+    ...theme.shadows.md,
+  },
+  savedEventImage: {
+    width: '100%',
+    height: 160,
+    backgroundColor: theme.colors.white,
+  },
+  savedEventInfo: {
+    padding: theme.spacing.md,
+  },
+  savedEventTitle: {
+    fontSize: theme.fontSize.sm,
+    fontFamily: 'Inter_600SemiBold',
+    color: theme.colors.textPrimary,
+    marginBottom: theme.spacing.xs,
+    lineHeight: 20,
+  },
+  savedEventDate: {
+    fontSize: theme.fontSize.sm,
+    fontFamily: 'Inter_500Medium',
+    color: theme.colors.primary,
+    marginBottom: theme.spacing.xs,
+  },
+  savedEventLocation: {
+    fontSize: theme.fontSize.sm,
+    fontFamily: 'Inter_400Regular',
+    color: theme.colors.textSecondary,
+  },
+  emptyState: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: theme.spacing.xxl,
+    paddingHorizontal: theme.spacing.lg,
+  },
+  emptyStateEmoji: {
+    fontSize: 48,
+    marginBottom: theme.spacing.md,
+  },
+  emptyStateText: {
+    fontSize: theme.fontSize.lg,
+    fontFamily: 'Inter_600SemiBold',
+    color: theme.colors.textPrimary,
+    marginBottom: theme.spacing.xs,
+  },
+  emptyStateSubtext: {
+    fontSize: theme.fontSize.sm,
+    fontFamily: 'Inter_400Regular',
+    color: theme.colors.textSecondary,
   },
 });
