@@ -103,7 +103,7 @@ export default function HomeScreen() {
       >
         {/* Header with Logo */}
         <View style={styles.header}>
-          <Text style={styles.logo}>Bevents</Text>
+          <Text style={styles.logo}>CALevents</Text>
         </View>
 
         {/* Search Bar */}

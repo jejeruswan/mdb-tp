@@ -1,8 +1,10 @@
 """
 Complete Test - Tests both CalLink and Berkeley Events scraping
+Now includes image URL extraction!
 """
 
 import os
+import re
 import time
 from datetime import datetime
 from selenium import webdriver
@@ -38,6 +40,30 @@ def categorize_event(title, description):
             category_scores[category] = score
     return max(category_scores, key=category_scores.get) if category_scores else 'leisure'
 
+def extract_image_url(element):
+    """Extract image URL from background-image style or img src"""
+    try:
+        # Method 1: Check for div with role="img" and background-image
+        img_divs = element.find_elements(By.CSS_SELECTOR, 'div[role="img"]')
+        for img_div in img_divs:
+            style = img_div.get_attribute('style')
+            if style:
+                # Extract URL from background-image: url('...')
+                url_match = re.search(r'url\(["\']?(https?://[^"\')]+)["\']?\)', style)
+                if url_match:
+                    return url_match.group(1)
+        
+        # Method 2: Check for regular img tags
+        img_tags = element.find_elements(By.TAG_NAME, 'img')
+        for img in img_tags:
+            src = img.get_attribute('src')
+            if src and src.startswith('http'):
+                return src
+        
+        return None
+    except Exception as e:
+        return None
+
 def setup_driver():
     chrome_options = Options()
     chrome_options.add_argument('--headless')
@@ -51,7 +77,7 @@ def setup_driver():
 
 def test_callink():
     print("\n" + "="*70)
-    print("🔍 TESTING CALLINK")
+    print("🔍 TESTING CALLINK (with images)")
     print("="*70 + "\n")
     
     driver = setup_driver()
@@ -86,6 +112,9 @@ def test_callink():
                 except:
                     pass
                 
+                # Get image URL
+                image_url = extract_image_url(element)
+                
                 # Get description
                 description = element.text.strip()
                 
@@ -93,7 +122,11 @@ def test_callink():
                     category = categorize_event(title, description)
                     
                     print(f"{i}. [{category.upper()}] {title[:60]}")
-                    print(f"   {url}")
+                    print(f"   URL: {url}")
+                    if image_url:
+                        print(f"   🖼️  Image: {image_url[:80]}...")
+                    else:
+                        print(f"   🖼️  Image: None")
                     
                     events.append({
                         'title': title[:200],
@@ -101,6 +134,7 @@ def test_callink():
                         'category': category,
                         'location': "Berkeley, CA",
                         'source_url': url,
+                        'image_url': image_url,
                         'scraped_at': datetime.now().isoformat()
                     })
                     
@@ -108,6 +142,8 @@ def test_callink():
                 print(f"⚠️  Error on event {i}: {e}")
         
         print(f"\n✅ CalLink: {len(events)} events extracted")
+        images_found = sum(1 for e in events if e.get('image_url'))
+        print(f"   🖼️  Images found: {images_found}/{len(events)}")
         
     except Exception as e:
         print(f"❌ CalLink Error: {e}")
@@ -120,7 +156,7 @@ def test_callink():
 
 def test_berkeley_events():
     print("\n" + "="*70)
-    print("🔍 TESTING BERKELEY EVENTS")
+    print("🔍 TESTING BERKELEY EVENTS (with images)")
     print("="*70 + "\n")
     
     driver = setup_driver()
@@ -161,6 +197,9 @@ def test_berkeley_events():
                 except:
                     pass
                 
+                # Get image URL
+                image_url = extract_image_url(element)
+                
                 # Get description
                 description = element.text.strip()
                 
@@ -168,7 +207,11 @@ def test_berkeley_events():
                     category = categorize_event(title, description)
                     
                     print(f"{i}. [{category.upper()}] {title[:60]}")
-                    print(f"   {url}")
+                    print(f"   URL: {url}")
+                    if image_url:
+                        print(f"   🖼️  Image: {image_url[:80]}...")
+                    else:
+                        print(f"   🖼️  Image: None")
                     
                     events.append({
                         'title': title[:200],
@@ -176,6 +219,7 @@ def test_berkeley_events():
                         'category': category,
                         'location': "Berkeley, CA",
                         'source_url': url,
+                        'image_url': image_url,
                         'scraped_at': datetime.now().isoformat()
                     })
                     
@@ -183,6 +227,8 @@ def test_berkeley_events():
                 print(f"⚠️  Error on event {i}: {e}")
         
         print(f"\n✅ Berkeley Events: {len(events)} events extracted")
+        images_found = sum(1 for e in events if e.get('image_url'))
+        print(f"   🖼️  Images found: {images_found}/{len(events)}")
         
     except Exception as e:
         print(f"❌ Berkeley Events Error: {e}")
@@ -195,7 +241,7 @@ def test_berkeley_events():
 
 def main():
     print("\n" + "="*70)
-    print("🎓 Berkeley Events Scraper - Complete Test")
+    print("🎓 Berkeley Events Scraper - Complete Test (with Images!)")
     print("="*70)
     
     callink_events = test_callink()
@@ -209,6 +255,10 @@ def main():
     print(f"Total events: {len(all_events)}")
     print(f"  - CalLink: {len(callink_events)}")
     print(f"  - Berkeley Events: {len(berkeley_events)}")
+    
+    # Image stats
+    total_images = sum(1 for e in all_events if e.get('image_url'))
+    print(f"\n🖼️  Total images: {total_images}/{len(all_events)}")
     
     # Category breakdown
     categories = {}
